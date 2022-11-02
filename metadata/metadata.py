@@ -6,6 +6,11 @@ from .mp4 import Mp4Atom
 from .camm import get_gpx_data as gpx_camm_data
 from .gpmd import get_gpx_data as gpx_gpmd_data
 
+from spatialmedia import metadata_utils
+
+def console(d):
+    print(d)
+
 def read_gpx(gpx, metadata):
     gpx_data = None
     if metadata == b'camm':
@@ -34,10 +39,10 @@ def write_metadata(mp4, gpx, output, metadata):
             with open(output_video, "wb") as o:
                 new_mp4.resize()
                 new_mp4.save(f, o)
-                #spatialmedia
+                """#spatialmedia
                 metadata = metadata_utils.Metadata()
                 metadata.video = metadata_utils.generate_spherical_xml("none", False)
                 print(metadata.video)
                 metadata_utils.inject_metadata(output_video, output, metadata,
                                                 console)
-                os.remove(output_video)
+                os.remove(output_video)"""
