@@ -1,0 +1,3 @@
+gpxpy==1.4.2
+geographiclib==2.0
+haversine==2.7.0
