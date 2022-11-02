@@ -33,7 +33,7 @@ def write_metadata(mp4, gpx, output, metadata):
     framerate = 5
     data = read_gpx(gpx, metadata)
     if data:
-        output_video = './temp.mp4'
+        #output_video = './temp.mp4'
         with open(mp4, "rb") as f:
             new_mp4 = create_metadata_atoms(f, data, framerate, metadata)
             with open(output_video, "wb") as o:
