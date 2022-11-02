@@ -41,22 +41,19 @@ def main():
             gpx = Path(args.gpx)
             output = Path(args.output)
             if (video.is_file() is not True):
-                print('Please provide a valid mp4 file')
+                print('Please provide a valid input mp4 file')
                 exit()
             if (gpx.is_file() is not True):
                 print('Please provide a valid gpx file')
                 exit()
-            """if (output.is_file() is True):
-                print('Please provide a valid output mp4 file')
-                exit()"""
             if (video.suffix.lower() != '.mp4'):
-                print('Please provide a valid mp4 file')
+                print('Please provide a valid input mp4 file')
                 exit()
             if (gpx.suffix.lower() != '.gpx'):
                 print('Please provide a valid gpx file')
                 exit()
             if (output.suffix.lower() != '.mp4'):
-                print('Please provide a valid mp4 file')
+                print('Output file should be a mp4 file')
                 exit()
             metadata = b''
             if args.inject_camm_metadata:

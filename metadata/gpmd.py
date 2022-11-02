@@ -121,8 +121,6 @@ class Gpmf(object):
             Repeat = struct.unpack(">H", data[start:end])[0]
             err = False
         return FourCC, Type, Size, Repeat, err
-        
-    
 
 def get_gpx_data(gpx_file):
     with open(gpx_file, "r") as f:
@@ -137,7 +135,6 @@ def get_gpx_data(gpx_file):
         for track in g.tracks:
             for segment in track.segments:
                 for point in segment.points:
-                    
                     timestamp = datetime.datetime.fromtimestamp(point.time.timestamp()).strftime('%Y-%m-%dT%H:%M:%S.%f')
                     devc_size = 0
                     gpmf = Gpmf()

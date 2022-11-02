@@ -271,12 +271,12 @@ def get_gpx_data(gpx_file):
                         metadata.velocity_up = float(point.extensions[4].text)
                         metadata.speed_accuracy = float(point.extensions[5].text)
                     else:
-                        metadata.horizontal_accuracy = 0.0
-                        metadata.vertical_accuracy = 0.0
-                        metadata.velocity_east = 0.0
-                        metadata.velocity_north = 0.0
-                        metadata.velocity_up = 0.0
-                        metadata.speed_accuracy = 0.0
+                        metadata.horizontal_accuracy = 1.0
+                        metadata.vertical_accuracy = 1.0
+                        metadata.velocity_east = 0.5
+                        metadata.velocity_north = 0.5
+                        metadata.velocity_up = 0
+                        metadata.speed_accuracy = 0
                     if point_time is None:
                         point_time = point.time
                         first_time = point.time

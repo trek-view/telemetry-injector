@@ -24,12 +24,20 @@ def create_metadata_atoms(f, data, framerate, metadata):
         new_mp4 = mp4_atoms.create_gpmd_metadata_atoms(f, data, framerate)
     return new_mp4
 
-def write_metadata(mp4, gpx, output_video, metadata):
+def write_metadata(mp4, gpx, output, metadata):
     framerate = 5
     data = read_gpx(gpx, metadata)
     if data:
+        output_video = './temp.mp4'
         with open(mp4, "rb") as f:
             new_mp4 = create_metadata_atoms(f, data, framerate, metadata)
             with open(output_video, "wb") as o:
                 new_mp4.resize()
                 new_mp4.save(f, o)
+                #spatialmedia
+                metadata = metadata_utils.Metadata()
+                metadata.video = metadata_utils.generate_spherical_xml("none", False)
+                print(metadata.video)
+                metadata_utils.inject_metadata(output_video, output, metadata,
+                                                console)
+                os.remove(output_video)
