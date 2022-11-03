@@ -6,3 +6,5 @@ Gemfile.lock
 __pycache__
 __pycache__/
 *.mp4
+
+telemetry-injector_venv/*
