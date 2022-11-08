@@ -70,7 +70,7 @@ def create_video_from_images(img_dir, output_dir, framerate, metadata):
     ms = 100.0/framerate/100.0
     images = {}
     video = None
-    output = os.path.join(output_dir, 'camm-video.mp4')
+    output = os.path.join(output_dir, 'metadata-video.mp4')
     json_output = get_images_metadata(img_dir, "")
     if len(json_output) < 10:
         print('Atleast 10 images are required.')
@@ -173,8 +173,8 @@ def create_video_from_images(img_dir, output_dir, framerate, metadata):
     if metadata == b'gpmd':
         write_metadata(video, gpx_path, output, framerate, b'gpmd')
     video = Path(video)
-    """if video.is_file():
-        os.remove(video)"""
+    if video.is_file():
+        os.remove(video)
         
 def read_gpx(gpx, metadata):
     gpx_data = None
@@ -210,4 +210,4 @@ def write_metadata(mp4, gpx, output, framerate, metadata):
                 metadata.video = metadata_utils.generate_spherical_xml("none", False)
                 metadata_utils.inject_metadata(output_video, output, metadata,
                                                 console)
-                #os.remove(output_video)
+                os.remove(output_video)
