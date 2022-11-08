@@ -81,9 +81,12 @@ def create_video_from_images(img_dir, output_dir, framerate, metadata):
     start_num = photo_num.split('.')[0]
     if len(photo_names) > 1:
         photo_names.remove(photo_num)
-        basename = photo_names.join('_')
+	print(photo_names)
+        basename = '_'.join(photo_names)
         video = os.path.join(output_dir, 'basename.mp4')
-        ffmpeg_video_from_images(os.path.join(img_dir, '%06d'+suffix), start_num, 5, video)
+	v_path = os.path.join(img_dir, '%06d'+suffix)
+	print('=>', v_path, video, start_num)
+        ffmpeg_video_from_images(v_path, start_num, 5, video)
     else:
         video = os.path.join(output_dir, 'basename.mp4')
         ffmpeg_video_from_images(os.path.join(img_dir, '%06d'+suffix), start_num, 5, video)
