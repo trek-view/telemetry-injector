@@ -195,7 +195,7 @@ def create_metadata_atoms(f, data, framerate, metadata):
     return new_mp4
 
 def write_metadata(mp4, gpx, output, framerate, metadata):
-    framerate = 1
+    #framerate = 1
     data = read_gpx(gpx, metadata)
     if data:
         output_video = './temp.mp4'
