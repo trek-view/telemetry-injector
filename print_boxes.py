@@ -21,16 +21,5 @@ with open(sys.argv[1], "rb") as f:
 
     for trak in mp4.moov.traks:
         if (trak.trak_type == b'camm') or (trak.trak_type == b'gpmd'):
-            print('\n\tTkhd:')
-            for k, v in trak.tkhd.getValues().items():
-                print('\t {}: {}'.format(k, v))
-            print('\n\tHdlr:')
-            for k, v in trak.hdlr.getValues().items():
-                print('\t {}: {}'.format(k, v))
-            print('\n\tMdhd:')
-            for k, v in trak.mdhd.getValues().items():
-                print('\t {}: {}'.format(k, v))
-            print('\n\tStsd:')
-            for k, v in trak.stsd.getValues().items():
-                print('\t {}: {}'.format(k, v))
-    print('')
+            z = trak.getValues()
+            print(json.dumps(z, indent=2))
