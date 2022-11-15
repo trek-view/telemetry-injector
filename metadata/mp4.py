@@ -687,12 +687,12 @@ class HdlrBox(box.Box):
 
     def getValues(self):
         return {
-            "component_type": self.component_type,
-            "component_sub_type": self.component_sub_type,
+            "component_type": str(self.component_type, 'utf-8'),
+            "component_sub_type": str(self.component_sub_type, 'utf-8'),
             "component_manufacturer": self.component_manufacturer,
             "component_flags": self.component_flags,
             "component_flags_mask": self.component_flags_mask,
-            "component_name": self.component_name,
+            "component_name": str(self.component_name, 'utf-8'),
         }
 
     @staticmethod
@@ -1087,22 +1087,22 @@ class TkhdBox(box.Box):
         if header_name == self.name:
             version_flag = in_fh.read(4)
             self.creation_time = struct.unpack(">I", in_fh.read(4))[0]
-            self.creation_time = since1904(self.creation_time)
+            #self.creation_time = since1904(self.creation_time)
             self.modification_time = struct.unpack(">I", in_fh.read(4))[0]
-            self.modification_time = since1904(self.modification_time)
+            #self.modification_time = since1904(self.modification_time)
             track_id = struct.unpack(">I", in_fh.read(4))[0]
             self.track_id = track_id
-            self.reserved = in_fh.read(8)
+            self.reserved = struct.unpack(">d", in_fh.read(8))[0]
             duration = struct.unpack(">I", in_fh.read(4))[0]
             self.duration = duration
-            self.reserved1 = in_fh.read(4)
+            self.reserved1 = struct.unpack(">I", in_fh.read(4))[0]
             layer = struct.unpack(">H", in_fh.read(2))[0]
             self.layer = layer
             alternate_group = struct.unpack(">H", in_fh.read(2))[0]
             self.alternate_group = alternate_group
             volume = struct.unpack(">H", in_fh.read(2))[0]
             self.volume = volume
-            self.reserved2 = in_fh.read(2)
+            self.reserved2 = struct.unpack(">H", in_fh.read(2))[0]
             matrix_structure = struct.unpack(">IIIIIIIII", in_fh.read(36))[0]
             self.matrix_structure = matrix_structure
             track_width = struct.unpack(">I", in_fh.read(4))[0]
