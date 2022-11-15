@@ -79,6 +79,14 @@ def create_video_from_images(img_dir, output_dir, framerate, metadata):
     photo_names = os.path.basename(json_output[0]['SourceFile']).split('_')
     photo_num = photo_names[-1]
     start_num = photo_num.split('.')[0]
+    narr = re.findall('[0-9]+', start_num)
+    print(narr, start_num)
+    if len(narr) < 1:
+        print('File name are not in sequence.')
+        exit()
+    start_num_name = narr[-1]
+    start_num_name = '%'+str(len(start_num_name))+'d'+suffix
+    print('start_num_name', start_num_name)
     if len(photo_names) > 1:
         photo_names.remove(photo_num)
         print(photo_names)
@@ -89,7 +97,9 @@ def create_video_from_images(img_dir, output_dir, framerate, metadata):
         ffmpeg_video_from_images(v_path, start_num, 5, video)
     else:
         video = os.path.join(output_dir, 'basename.mp4')
-        ffmpeg_video_from_images(os.path.join(img_dir, '%06d'+suffix), start_num, 5, video)
+        v_path = os.path.join(img_dir, start_num_name)
+        print('=>', v_path)
+        ffmpeg_video_from_images(v_path, start_num, 5, video)
         basename = json_output[0]['SourceFile'].split(os.sep)[-2]
     
     for img in json_output:
