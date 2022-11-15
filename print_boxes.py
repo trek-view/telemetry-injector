@@ -16,6 +16,8 @@ with open(sys.argv[1], "rb") as f:
         print('')
     
     mp4_st.print_structure()
+    
+    print(json.dumps(mp4.moov.mvhd.getValues(), indent=2))
 
     print('Metadata Track:')
 
