@@ -150,7 +150,7 @@ def create_video_from_images(img_dir, output_dir, framerate, metadata):
             else:
                 v_east = 0.5
                 v_north = 0.5
-                v_up = alt/time_diff
+                v_up = 0
         else:
             v_east = 0.5
             v_north = 0.5
