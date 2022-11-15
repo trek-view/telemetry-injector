@@ -24,6 +24,9 @@ import gpxpy
 import gpxpy.gpx
 from calendar import timegm
 
+from .camm import *
+from .gpmd import *
+
 def since1904_to_seconds(dt):
     start = datetime.datetime.strptime('1904-1-1T00:00:00.000', '%Y-%m-%dT%H:%M:%S.%f')
     end = datetime.datetime.strptime(
@@ -74,6 +77,7 @@ class StsdBox(box.Box):
         self.data_format = b''
         self.format_data = None
         self.data_size = 16
+        self.entries = []
 
     def load(self, in_fh, position):
         if position is None:
@@ -95,9 +99,14 @@ class StsdBox(box.Box):
                 data_format = in_fh.read(4)
                 self.data_format = data_format
                 self.format_data = in_fh.read(self.data_size-8)
-                
+                self.entries.append([self.data_format, self.format_data])
                 #print(self.data_size, self.data_format, self.format_data)
-
+    def getValues(self):
+        return {
+            'entries': self.entries,
+            'values': len(self.entries),
+        }
+    
     @staticmethod
     def create():
         new_box = StsdBox()
@@ -629,6 +638,13 @@ class HdlrBox(box.Box):
         self.version = 0
         self.position = None
 
+        self.component_type = 0
+        self.component_sub_type = 0
+        self.component_manufacturer = 0
+        self.component_flags = 0
+        self.component_flags_mask = 0
+        self.component_name = ''
+
         self.quicktime_type = 0
         self.subtype_metadata_type = 0
         self.quicktime_manufacutured_reserved = 0
@@ -649,6 +665,15 @@ class HdlrBox(box.Box):
         header_name = header[4:8]
         if header_name == self.name:
             version_flag = in_fh.read(4)
+
+            self.component_type = in_fh.read(4)
+            self.component_sub_type = in_fh.read(4)
+            self.component_manufacturer = struct.unpack(">I", in_fh.read(4))[0]
+            self.component_flags = struct.unpack(">I", in_fh.read(4))[0]
+            self.component_flags_mask = struct.unpack(">I", in_fh.read(4))[0]
+            component_length = header_size - 8 - (6*4)
+            self.component_name = in_fh.read(component_length)
+
             self.quicktime_type = in_fh.read(4)
             self.subtype_metadata_type = in_fh.read(4)
             self.quicktime_manufacutured_reserved = in_fh.read(4)
@@ -658,16 +683,16 @@ class HdlrBox(box.Box):
             self.component_name_string_end = in_fh.read(1)
             
             
+            
 
     def getValues(self):
         return {
-            "quicktime_type": self.quicktime_type,
-            "subtype_metadata_type": self.subtype_metadata_type,
-            "quicktime_manufacutured_reserved": self.quicktime_manufacutured_reserved,
-            "quicktime_component_reserved_flags": self.quicktime_component_reserved_flags,
-            "quicktime_component_reserved_flags_mask": self.quicktime_component_reserved_flags_mask,
-            "quicktime_component_reserved_flags_mask": self.quicktime_component_reserved_flags_mask,
-            "component_name_string_end": self.component_name_string_end,
+            "component_type": self.component_type,
+            "component_sub_type": self.component_sub_type,
+            "component_manufacturer": self.component_manufacturer,
+            "component_flags": self.component_flags,
+            "component_flags_mask": self.component_flags_mask,
+            "component_name": self.component_name,
         }
 
     @staticmethod
@@ -1618,6 +1643,7 @@ class TrakAtom():
     edts = EdtsBox()
     mdhd = MdhdBox()
     hdlr = HdlrBox()
+    stsd = StsdBox()
     stts = SttsBox()
     stsc = StscBox()
     stsz = StszBox()
@@ -1754,7 +1780,82 @@ class Mp4Atom():
             }
             values.append(trak_values)
         return values
-            
+
+    def __get_sample_chunks(self, trak):
+        stsc_chunks = []
+        last_chunk = None
+        for chunk in trak.stsc.frames:
+            if last_chunk:
+                diff = chunk[0] - last_chunk[0] - 1
+                if diff > 0:
+                    for i in range(0, diff):
+                       stsc_chunks.append(last_chunk[1]) 
+            stsc_chunks.append(chunk[1]) 
+            last_chunk = chunk
+        return stsc_chunks
+
+    def __get_offset_data(self, f, trak):
+        offset_data = []
+        offsets = []
+        if trak is None:
+            return offset_data
+        #print(trak)
+        if trak.co64 is not None:
+            if len(trak.co64.offsets) > 0:
+                offsets = trak.co64.offsets
+        elif trak.stco is not None:
+            if len(trak.stco.offsets) > 0:
+                offsets = trak.stco.offsets
+        offsets_len = len(offsets)
+        sample_chunks = self.__get_sample_chunks(trak)
+        chunks_len = len(sample_chunks)
+        sizes_len = len(trak.stsz.sizes)
+        for i in range(0, offsets_len):
+            offset = offsets[i]
+            chunks = 1
+            if i < chunks_len:
+                chunks = sample_chunks[i]
+            k = i+chunks
+            if k <= sizes_len:
+                for j in range(i, k):
+                    size = trak.stsz.sizes[j]
+                    f.seek(offset)
+                    data = f.read(size)
+                    if data:
+                        offset_data.append(data)
+                    offset += size
+        return offset_data
+
+    def get_camm_raw_metadata(self, f):
+        metadata = []
+        trak = self.get_metadata_track(b'camm')
+        offset_data = self.__get_offset_data(f, trak)
+        for od in offset_data:
+            metadata.append(od)
+        return metadata
+
+    def get_camm_metadata(self, f):
+        metadata = []
+        trak = self.get_metadata_track(b'camm')
+        offset_data = self.__get_offset_data(f, trak)
+        for od in offset_data:
+            camm = CammMetadata()
+            data = camm.read(od)
+            if data:
+                metadata.append(data)
+        return metadata
+
+    """def get_gpmd_metadata(self, f):
+        metadata = []
+        trak = self.get_metadata_track(b'gpmd')
+        offset_data = self.__get_offset_data(f, trak)
+        for od in offset_data:
+            gpmd = GpmdMetadata()
+            data = gpmd.read(od)
+            if data:
+                metadata.append(data)
+        return metadata"""
+
     def create_camm_metadata_atoms(self, f, mdata, framerate):
         mp4_st = mpeg4_container.load(f)
         mp4 = Mp4Atom()
