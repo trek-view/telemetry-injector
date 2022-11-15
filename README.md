@@ -39,7 +39,7 @@ Setup virtual environment
 
 ```shell
 python3 -m venv telemetry-injector_venv
-source c/bin/activate
+source telemetry-injector_venv/bin/activate
 ```
 
 Install required libraries
