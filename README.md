@@ -66,13 +66,13 @@ python3 telemetry-injector.py -c -i INPUT_IMAGE_DIRECTORY/ -o OUTPUT_VIDEO_FILE.
 For `camm` images metadata injection
 	
 ```shell
-python3 telemetry-injector.py -c -i input_image_directory -o output_mp4_video_file
+python3 telemetry-injector.py -c -i input_image_directory -o OUTPUT_VIDEO_FILE.mp4
 ```
 
 For `gpmf` images metadata injection
 
 ```shell
-python3 telemetry-injector.py -g -i input_image_directory -o output_mp4_video_file
+python3 telemetry-injector.py -g -i input_image_directory -o OUTPUT_VIDEO_FILE.mp4
 ```
 
 
