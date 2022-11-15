@@ -92,7 +92,7 @@ def create_video_from_images(img_dir, output_dir, framerate, metadata):
         print(photo_names)
         basename = '_'.join(photo_names)
         video = os.path.join(output_dir, 'basename.mp4')
-        v_path = os.path.join(img_dir, basename+'_%06d'+suffix)
+        v_path = os.path.join(img_dir, basename+'_'+start_num_name)
         print('=>', v_path, video, start_num)
         ffmpeg_video_from_images(v_path, start_num, 5, video)
     else:
@@ -122,6 +122,7 @@ def create_video_from_images(img_dir, output_dir, framerate, metadata):
         g = images[k]
         start_latitude = latLngToDecimal(g['GPSLatitude'])
         start_longitude = latLngToDecimal(g['GPSLongitude'])
+        start_altitude = latLngToDecimal(g['GPSAltitude'])
         if i < (len(keys)-1):
             g_next = images[keys[i+1]]
             m = g_next['GPSDateTime'].split('.')
@@ -132,6 +133,7 @@ def create_video_from_images(img_dir, output_dir, framerate, metadata):
 
             end_latitude = latLngToDecimal(g_next['GPSLatitude'])
             end_longitude = latLngToDecimal(g_next['GPSLongitude'])
+            end_altitude = latLngToDecimal(g_next['GPSAltitude'])
             
             distance = haversine((start_latitude, start_longitude), (end_latitude, end_longitude), Unit.METERS)
 
@@ -140,14 +142,15 @@ def create_video_from_images(img_dir, output_dir, framerate, metadata):
             azimuth2 = (brng['azi2'] + 360) % 360
             AC = math.sin(math.radians(azimuth1))*distance
             BC = math.cos(math.radians(azimuth2))*distance
-
+            alt = end_altitude - start_altitude
             if time_diff > 0:
                 v_east = AC/time_diff
                 v_north = BC/time_diff
+                v_up = alt/time_diff
             else:
                 v_east = 0.5
                 v_north = 0.5
-            v_up = 0
+                v_up = alt/time_diff
         else:
             v_east = 0.5
             v_north = 0.5
