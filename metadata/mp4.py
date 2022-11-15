@@ -1667,7 +1667,6 @@ class TrakAtom():
             'stsz': self.stsz.getValues(),
             'stco': self.stco.getValues(),
             'co64': self.co64.getValues(),
-            'mvhd': self.mvhd.getValues(),
             #'meta': self.meta.getValues()
         }
 
