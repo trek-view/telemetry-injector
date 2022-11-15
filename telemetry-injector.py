@@ -47,14 +47,23 @@ def main():
             metadata = b'gpmd'
         if args.images_directory and args.output:
             images_directory = Path(args.images_directory)
-            output_dir = Path(args.output)
+            output_vid = Path(args.output).absolute()
+            output_dir = output_vid.parent
             if (images_directory.is_dir() is not True):
                 print('Please provide a valid images directory')
                 exit()
             if (output_dir.is_dir()  is not True):
                 print('Please provide a valid output directory')
                 exit()
-            create_video_from_images(images_directory, output_dir, framerate, metadata)
+            if output_vid.is_file() or output_vid.is_dir():
+                print('Output file already exists.')
+                exit()
+            if (output_vid.suffix.lower() != '.mp4'):
+                print('Output file should be a mp4.')
+                exit()
+            print('Creating video in {} directory'.format(output_dir))
+            o_vid = str(output_vid.name)
+            create_video_from_images(images_directory, output_dir, output_vid, o_vid, framerate, metadata)
         elif args.video and args.gpx and args.output:
             video = Path(args.video)
             gpx = Path(args.gpx)
