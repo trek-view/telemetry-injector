@@ -65,6 +65,32 @@ def get_images_metadata(img_dir, fn):
     json_output = json.loads(json_output)
     return json_output
 
+def get_ff_names(path_name):
+    path_name = Path(path_name)
+    suffix = path_name.suffix
+    name = os.path.basename(path_name)
+    basename = ''
+    s = name.split('_')
+    name = s[-1]
+    if len(s) > 1:
+        s.remove(name)
+        basename = '_'.join(s)
+        basename = basename + '_'
+    start_num = name.split('.')[0]
+    pattern = '%06d.jpg'
+    narr = re.findall('([a-zA-Z]+)([0-9]+)', start_num)
+    if len(narr) > 0:
+        if len(narr[0]) > 1:
+            start_num = narr[0][1]
+            pattern = narr[0][0]+'%0'+str(len(narr[0][1]))+'d'+suffix
+    else:
+        narr = re.findall('[0-9]+', start_num)
+        if len(narr) > 0:
+            start_num = narr[0]
+            pattern = '%0'+str(len(narr[0]))+'d'+suffix
+    pattern = basename + pattern
+    return start_num, pattern
+
 def create_video_from_images(img_dir, output_dir, framerate, metadata):
     framerate = 5.0
     ms = 100.0/framerate/100.0
@@ -78,26 +104,19 @@ def create_video_from_images(img_dir, output_dir, framerate, metadata):
     suffix = Path(json_output[0]['SourceFile']).suffix
     photo_names = os.path.basename(json_output[0]['SourceFile']).split('_')
     photo_num = photo_names[-1]
-    start_num = photo_num.split('.')[0]
-    narr = re.findall('[0-9]+', start_num)
-    print(narr, start_num)
-    if len(narr) < 1:
-        print('File name are not in sequence.')
-        exit()
-    start_num_name = narr[-1]
-    start_num_name = '%'+str(len(start_num_name))+'d'+suffix
-    print('start_num_name', start_num_name)
+    start_num, pattern = get_ff_names(os.path.basename(json_output[0]['SourceFile']))
+    print('start_num, pattern', start_num, pattern)
     if len(photo_names) > 1:
         photo_names.remove(photo_num)
         print(photo_names)
         basename = '_'.join(photo_names)
         video = os.path.join(output_dir, 'basename.mp4')
-        v_path = os.path.join(img_dir, basename+'_'+start_num_name)
+        v_path = os.path.join(img_dir, pattern)
         print('=>', v_path, video, start_num)
         ffmpeg_video_from_images(v_path, start_num, 5, video)
     else:
         video = os.path.join(output_dir, 'basename.mp4')
-        v_path = os.path.join(img_dir, start_num_name)
+        v_path = os.path.join(img_dir, pattern)
         print('=>', v_path)
         ffmpeg_video_from_images(v_path, start_num, 5, video)
         basename = json_output[0]['SourceFile'].split(os.sep)[-2]
@@ -122,7 +141,7 @@ def create_video_from_images(img_dir, output_dir, framerate, metadata):
         g = images[k]
         start_latitude = latLngToDecimal(g['GPSLatitude'])
         start_longitude = latLngToDecimal(g['GPSLongitude'])
-        start_altitude = latLngToDecimal(g['GPSAltitude'])
+        start_altitude = getAltitudeFloat(g['GPSAltitude'])
         if i < (len(keys)-1):
             g_next = images[keys[i+1]]
             m = g_next['GPSDateTime'].split('.')
@@ -133,7 +152,7 @@ def create_video_from_images(img_dir, output_dir, framerate, metadata):
 
             end_latitude = latLngToDecimal(g_next['GPSLatitude'])
             end_longitude = latLngToDecimal(g_next['GPSLongitude'])
-            end_altitude = latLngToDecimal(g_next['GPSAltitude'])
+            end_altitude = getAltitudeFloat(g_next['GPSAltitude'])
             
             distance = haversine((start_latitude, start_longitude), (end_latitude, end_longitude), Unit.METERS)
 
