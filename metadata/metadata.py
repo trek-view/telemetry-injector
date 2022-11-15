@@ -131,8 +131,12 @@ def create_video_from_images(img_dir, output_dir, framerate, metadata):
             AC = math.sin(math.radians(azimuth1))*distance
             BC = math.cos(math.radians(azimuth2))*distance
 
-            v_east = AC/time_diff
-            v_north = BC/time_diff
+            if time_diff > 0:
+                v_east = AC/time_diff
+                v_north = BC/time_diff
+            else:
+                v_east = 0.5
+                v_north = 0.5
             v_up = 0
         else:
             v_east = 0.5
