@@ -91,12 +91,12 @@ def get_ff_names(path_name):
     pattern = basename + pattern
     return start_num, pattern
 
-def create_video_from_images(img_dir, output_dir, framerate, metadata):
+def create_video_from_images(img_dir, output_dir, output_vid, o_vid, framerate, metadata):
     framerate = 5.0
     ms = 100.0/framerate/100.0
     images = {}
     video = None
-    output = os.path.join(output_dir, 'metadata-video.mp4')
+    output = os.path.join(output_dir, o_vid)
     json_output = get_images_metadata(img_dir, "")
     if len(json_output) < 10:
         print('Atleast 10 images are required.')
