@@ -247,6 +247,83 @@ class CammMetadataCase7():
             self.magnetic_field_3
         ]
 
+class CammMetadata():
+    def __init__(self):
+        pass
+    def read(self, data):
+        c_data = None
+        if len(data) >= 16:
+            header = struct.unpack("<H", data[0:2])[0]
+            case = struct.unpack("<H", data[2:4])[0]
+            if case == 0:
+                c = CammMetadataCase0()
+                c.read(data)
+                c_data = c.data()
+                c_data = {
+                    'type': 0,
+                    'data': c_data
+                }
+            elif case == 1:
+                c = CammMetadataCase1()
+                c.read(data)
+                c_data = c.data()
+                c_data = {
+                    'type': 1,
+                    'data': c_data
+                }
+            elif case == 2:
+                c = CammMetadataCase2()
+                c.read(data)
+                c_data = c.data()
+                c_data = {
+                    'type': 2,
+                    'data': c_data
+                }
+            elif case == 3:
+                c = CammMetadataCase3()
+                c.read(data)
+                c_data = c.data()
+                c_data = {
+                    'type': 3,
+                    'data': c_data
+                }
+            elif case == 4:
+                c = CammMetadataCase4()
+                c.read(data)
+                c_data = c.data()
+                c_data = {
+                    'type': 4,
+                    'data': c_data
+                }
+            elif case == 5:
+                c = CammMetadataCase5()
+                c.read(data)
+                c_data = c.data()
+                c_data = {
+                    'type': 5,
+                    'data': c_data
+                }
+            elif case == 6:
+                c = CammMetadataCase6()
+                c.read(data)
+                c_data = c.data()
+                c_data = {
+                    'type': 6,
+                    'data': c_data
+                }
+            elif case == 7:
+                c = CammMetadataCase7()
+                c.read(data)
+                c_data = c.data()
+                c_data = {
+                    'type': 7,
+                    'data': c_data
+                }
+            else:
+                c_data = None
+        return c_data
+    
+
 def get_gpx_data(gpx_file):
     with open(gpx_file, "r") as f:
         g = gpxpy.parse(f)
