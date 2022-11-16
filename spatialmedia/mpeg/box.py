@@ -102,8 +102,8 @@ class Box(object):
             stco_copy(in_fh, out_fh, self, delta)
         elif self.name == constants.TAG_CO64:
             co64_copy(in_fh, out_fh, self, delta)
-        elif self.name == constants.TAG_MDAT: #mdat additions
-            if self.data:
+        elif self.name == constants.TAG_MDAT: 
+            if self.data: #mdat additions
                 tag_copy(in_fh, out_fh, self.content_size - len(self.data))
                 if self.data:
                     out_fh.write(self.data)
