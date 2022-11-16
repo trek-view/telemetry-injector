@@ -140,7 +140,7 @@ def read_atoms(f, pos, fsize):
         f.seek(pos)
         size = struct.unpack(">I", f.read(4))[0]
         if size == 1:
-            size = struct.unpack(">Q", fh.read(8))[0]
+            size = struct.unpack(">Q", f.read(8))[0]
             box_data['header_size'] = 16
         atom = f.read(4)
         box_data['size'] = size
