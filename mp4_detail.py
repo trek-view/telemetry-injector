@@ -149,7 +149,7 @@ def read_atoms(f, pos, fsize):
         except:
             box_data['name'] = str(atom)
         pos = f.tell()
-        atom_offset = pos + size - 8
+        atom_offset = pos + size - box_data['header_size']
         if atom_offset > fsize:
             break
         if atom in __containers:
