@@ -69,30 +69,21 @@ def get_ff_names(path_name):
     path_name = Path(path_name)
     suffix = path_name.suffix
     name = os.path.basename(path_name)
-    basename = ''
-    s = name.split('_')
-    name = s[-1]
-    if len(s) > 1:
-        s.remove(name)
-        basename = '_'.join(s)
-        basename = basename + '_'
-    start_num = name.split('.')[0]
+    _name = re.findall('(.*?)([0-9]+)', name)
+    start_num = name
     pattern = '%06d.jpg'
-    narr = re.findall('([a-zA-Z]+)([0-9]+)', start_num)
-    if len(narr) > 0:
-        if len(narr[0]) > 1:
-            start_num = narr[0][1]
-            pattern = narr[0][0]+'%0'+str(len(narr[0][1]))+'d'+suffix
-    else:
-        narr = re.findall('[0-9]+', start_num)
-        if len(narr) > 0:
-            start_num = narr[0]
-            pattern = '%0'+str(len(narr[0]))+'d'+suffix
-    pattern = basename + pattern
-    return start_num, pattern
+    err = True
+    if len(_name) == 1:
+        _name = list(_name[0])
+        if len(_name) > 1:
+            start_num = _name[-1]
+            _name.remove(start_num)
+            _name = ''.join(_name)
+            pattern = _name+'%0'+str(len(start_num))+'d'+suffix
+            err = False
+    return start_num, pattern, err
 
 def create_video_from_images(img_dir, output_dir, output_vid, o_vid, framerate, metadata):
-    framerate = 5.0
     ms = 100.0/framerate/100.0
     images = {}
     video = None
@@ -104,7 +95,10 @@ def create_video_from_images(img_dir, output_dir, output_vid, o_vid, framerate, 
     suffix = Path(json_output[0]['SourceFile']).suffix
     photo_names = os.path.basename(json_output[0]['SourceFile']).split('_')
     photo_num = photo_names[-1]
-    start_num, pattern = get_ff_names(os.path.basename(json_output[0]['SourceFile']))
+    start_num, pattern, err = get_ff_names(os.path.basename(json_output[0]['SourceFile']))
+    if err:
+        print('Image file name has no proper sequence. Please make sure images are in sequence and has ascending numbering (00001, 00002..., 00008) etc.')
+        exit()
     print('start_num, pattern', start_num, pattern)
     if len(photo_names) > 1:
         photo_names.remove(photo_num)
