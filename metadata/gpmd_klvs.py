@@ -97,17 +97,19 @@ def pack_klv(data, FourCC, ktype, size, repeat, scal_value):
     if scal_value:
         scal = scal_value[0]
         if type(scal) == list:
-            if len(scal) <= klv_count:
+            if len(scal) == 1:
                 scal = scal[0]
     klv_data = b''
     if type(data) == list:
         for k in data:
+            j = 0
             for v in k:
                 if scal and (FourCC in scal_four_cc) :
                     if type(scal) == list:
                         v = v*scal[j]
                     else:
                         v = v*scal
+                j += 1
                 k_data = get_pack_data(v, ktype)
                 if k_data == b'':
                     k_data = struct.pack(btype, v)
