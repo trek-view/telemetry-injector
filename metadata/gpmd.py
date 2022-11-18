@@ -155,8 +155,8 @@ def get_gpx_data(gpx_file):
                     dvnm = Gpmf()
                     dvnm.key = b'DVNM'
                     dvnm.type = ord('c')
-                    dvnm.size = 9
-                    dvnm.repeat = 1
+                    dvnm.size = 1
+                    dvnm.repeat = 9
                     dvnm.childrens.append({
                         'data': b'GoPro Max'
                     })
