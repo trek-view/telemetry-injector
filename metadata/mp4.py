@@ -1798,13 +1798,13 @@ class Mp4Atom():
         offsets = []
         if trak is None:
             return offset_data
-        #print(trak)
         if trak.co64 is not None:
             if len(trak.co64.offsets) > 0:
                 offsets = trak.co64.offsets
-        elif trak.stco is not None:
-            if len(trak.stco.offsets) > 0:
-                offsets = trak.stco.offsets
+        if len(offsets) == 0:
+            if trak.stco is not None:
+                if len(trak.stco.offsets) > 0:
+                    offsets = trak.stco.offsets
         offsets_len = len(offsets)
         sample_chunks = self.__get_sample_chunks(trak)
         chunks_len = len(sample_chunks)
@@ -1844,6 +1844,14 @@ class Mp4Atom():
                 metadata.append(data)
         return metadata
 
+    def get_gpmd_raw_metadata(self, f):
+        metadata = []
+        trak = self.get_metadata_track(b'gpmd')
+        offset_data = self.__get_offset_data(f, trak)
+        for od in offset_data:
+            metadata.append(od)
+        return metadata
+
     """def get_gpmd_metadata(self, f):
         metadata = []
         trak = self.get_metadata_track(b'gpmd')
@@ -1857,6 +1865,7 @@ class Mp4Atom():
 
     def create_camm_metadata_atoms(self, f, mdata, framerate):
         mp4_st = mpeg4_container.load(f)
+        mp4_st.print_structure()
         mp4 = Mp4Atom()
         mp4.read_atoms(f, mp4_st)
         ftyp = None
@@ -1885,7 +1894,9 @@ class Mp4Atom():
         framerate = framerate
         timescale = 90000
         mdat_size = mdat.size()-8
+        print('mdat_size', mdat_size)
         m_pos = mdat.position + mdat_size+8
+        print('m_pos', m_pos)
         metadatas = mdata['metadata']
         metadata_duration = mdata['duration']
         start_time = int(since1904_to_seconds(mdata['start_time']))
@@ -1900,6 +1911,7 @@ class Mp4Atom():
             times.append([1, d])
             sizes.append(l)
             offsets.append(m_pos)
+            print('m_pos', m_pos, m['metadata'])
             m_pos += l
             frames.append([i,1, 1])
             i += 1
@@ -1987,6 +1999,7 @@ class Mp4Atom():
 
     def create_gpmd_metadata_atoms(self, f, mdata, framerate):
         mp4_st = mpeg4_container.load(f)
+        mp4_st.print_structure()
         mp4 = Mp4Atom()
         mp4.read_atoms(f, mp4_st)
         ftyp = None
@@ -2019,8 +2032,11 @@ class Mp4Atom():
         start_time = int(since1904_to_seconds(mdata['start_time']))
 
         mdat_size = mdat.size()-8
-        m_pos = mdat.position + mdat_size+8
         
+        print('mdat_size', mdat_size)
+        m_pos = mdat.position + mdat_size+8
+        print('pos', m_pos)
+
         mp4_st.resize()
         moov.resize()
         mp4_st.resize()
@@ -2029,7 +2045,7 @@ class Mp4Atom():
             data += m['metadata']
             l = len(m['metadata'])
             d = int(timescale/framerate)
-            
+            print('pos', m_pos, m['metadata'])
             times.append([1, d])
             sizes.append(l)
             offsets.append(m_pos)
