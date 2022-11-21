@@ -57,6 +57,38 @@ class StcoBox(Box):
     def get_values(self):
         pass
 
+class Co64Box(Box):
+    def __init__(self):
+        Box.__init__(self)
+        self.name = b'stco'
+        self.total = 0
+        self.entries = []
+    def load(self, f, pos, size):
+        version_flags = f.read(4)
+        total = f.read(4)
+        self.total = struct.unpack(">L", total)[0]
+        d_size = self.header_size
+        for i in range(0, self.total):
+            offset = f.read(8)
+            offset = struct.unpack(">Q", offset)[0]
+            self.entries.append(offset)
+            d_size += 8
+            if d_size > size:
+                break
+        self.content_size = d_size - self.header_size
+    def create(self):
+        pass
+    @staticmethod
+    def get_data(data):
+        binary = b''
+        binary += struct.pack(">L", 0)
+        binary += struct.pack(">L", data['total_values'])
+        for i in data['entries']:
+            binary += struct.pack(">Q", i)
+        return binary
+    def get_values(self):
+        pass
+
 class SttsBox(Box):
     def __init__(self):
         Box.__init__(self)
@@ -91,10 +123,80 @@ class SttsBox(Box):
     def get_values(self):
         pass
 
+class StszBox(Box):
+    def __init__(self):
+        Box.__init__(self)
+        self.name = b'stsz'
+        self.total = 0
+        self.entries = []
+    def load(self, f, pos, size):
+        version_flags = f.read(4)
+        block_size = f.read(4)
+        self.block_size = struct.unpack(">L", block_size)[0]
+        total = f.read(4)
+        self.total = struct.unpack(">L", total)[0]
+        d_size = self.header_size
+        for i in range(0, self.total):
+            t1 = struct.unpack(">L", f.read(4))[0]
+            self.entries.append(t1)
+            d_size += 4
+            if d_size > size:
+                break
+        self.content_size = d_size - self.header_size
+    def create(self):
+        pass
+    @staticmethod
+    def get_data(data):
+        binary = b''
+        binary += struct.pack(">L", 0)
+        inary += struct.pack(">L", data['block_size'])
+        binary += struct.pack(">L", data['total_values'])
+        for i in data['entries']:
+            binary += struct.pack(">L", i)
+        return binary
+    def get_values(self):
+        pass
+
+class StscBox(Box):
+    def __init__(self):
+        Box.__init__(self)
+        self.name = b'stsc'
+        self.total = 0
+        self.entries = []
+    def load(self, f, pos, size):
+        version_flags = f.read(4)
+        total = f.read(4)
+        self.total = struct.unpack(">L", total)[0]
+        d_size = self.header_size
+        for i in range(0, self.total):
+            t1 = struct.unpack(">L", f.read(4))[0]
+            t2 = struct.unpack(">L", f.read(4))[0]
+            t3 = struct.unpack(">L", f.read(4))[0]
+            self.entries.append([t1, t2, t3])
+            d_size += 4
+            d_size += 4
+            d_size += 4
+            if d_size > size:
+                break
+        self.content_size = d_size - self.header_size
+    def create(self):
+        pass
+    @staticmethod
+    def get_data(data):
+        binary = b''
+        binary += struct.pack(">L", 0)
+        binary += struct.pack(">L", data['total_values'])
+        for i in data['entries']:
+            binary += struct.pack(">L", i[0])
+            binary += struct.pack(">L", i[1])
+            binary += struct.pack(">L", i[2])
+        return binary
+    def get_values(self):
+        pass
+
 
 __containers = [
     b'moov',
-    b'meta',
     b'trak',
     b'mdia',
     b'minf',
@@ -109,6 +211,8 @@ def get_data(atom):
         return StcoBox.get_data(atom['data'])
     elif atom['name'] == 'stts':
         return SttsBox.get_data(atom['data'])
+    elif atom['name'] == 'co64':
+        return Co64Box.get_data(atom['data'])
     else:
         return b''
 
@@ -118,10 +222,22 @@ def read_childrens(f, pos, fsize, atom):
         stco = StcoBox()
         stco.load(f, pos, fsize)
         data = stco.get_json_values()
+    if atom == b'co64':
+        co64 = Co64Box()
+        co64.load(f, pos, fsize)
+        data = co64.get_json_values()
     elif atom == b'stts':
         stts = SttsBox()
         stts.load(f, pos, fsize)
         data = stts.get_json_values()
+    elif atom == b'stsz':
+        stsz = StszBox()
+        stsz.load(f, pos, fsize)
+        data = stsz.get_json_values()
+    elif atom == b'stsc':
+        stsc = StscBox()
+        stsc.load(f, pos, fsize)
+        data = stsc.get_json_values()
     f.seek(pos)
     return data
 
@@ -139,10 +255,12 @@ def read_atoms(f, pos, fsize):
         }
         f.seek(pos)
         size = struct.unpack(">I", f.read(4))[0]
+        atom = f.read(4)
+        if size == 0:
+            break
         if size == 1:
             size = struct.unpack(">Q", f.read(8))[0]
             box_data['header_size'] = 16
-        atom = f.read(4)
         box_data['size'] = size
         try:
             box_data['name'] = str(atom, 'utf-8')
@@ -170,7 +288,9 @@ def read_atoms(f, pos, fsize):
             box_data['data'] = data
             childrens.append({ _atom: box_data})
         f.seek(atom_offset)
+        
         pos = f.tell()
+
     return childrens
 
 def main():
