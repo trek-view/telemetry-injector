@@ -1893,6 +1893,7 @@ class Mp4Atom():
         offsets = []
         framerate = framerate
         timescale = 90000
+        mdat.header_size = 16
         mdat_size = mdat.size()-8
         print('mdat_size', mdat_size)
         m_pos = mdat.position + mdat_size+8
