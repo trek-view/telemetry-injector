@@ -15,6 +15,12 @@ with open(sys.argv[1], "rb") as f:
         print(m)
         print('')
     
+    metadata = mp4.get_gpmd_raw_metadata(f)
+    for m in metadata:
+        print('')
+        print(m)
+        print('')
+    
     mp4_st.print_structure()
     
     print(json.dumps(mp4.moov.mvhd.getValues(), indent=2))
