@@ -256,7 +256,7 @@ def read_atoms(f, pos, fsize):
         f.seek(pos)
         size = struct.unpack(">I", f.read(4))[0]
         atom = f.read(4)
-        if size == 0:
+        if size < 1:
             break
         if size == 1:
             size = struct.unpack(">Q", f.read(8))[0]
