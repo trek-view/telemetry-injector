@@ -217,6 +217,7 @@ def get_data(atom):
         return b''
 
 def read_childrens(f, pos, fsize, atom):
+    f.seek(pos)
     data = None
     if atom == b'stco':
         stco = StcoBox()
@@ -238,7 +239,10 @@ def read_childrens(f, pos, fsize, atom):
         stsc = StscBox()
         stsc.load(f, pos, fsize)
         data = stsc.get_json_values()
-    f.seek(pos)
+    elif atom == b'stsd':
+        print(f.read(fsize-8))
+        print('')
+    
     return data
 
 def read_atoms(f, pos, fsize):
