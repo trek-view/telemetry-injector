@@ -1,4 +1,4 @@
-import os, sys, json, struct
+import os, sys, json, struct, time
 from pathlib import Path
 
 #Inspired from spatialmedia: https://github.com/google/spatial-media
@@ -8,6 +8,7 @@ class Box():
         self.header_size = 8
         self.content_size = 0
         self.name = b''
+        self.entries = []
     def load(self, f, pos, size):
         pass
     def create(self):
@@ -194,6 +195,131 @@ class StscBox(Box):
     def get_values(self):
         pass
 
+class StsdBox(Box):
+    def __init__(self):
+        Box.__init__(self)
+        self.name = b'stsd'
+        self.total = 0
+        self.entries = []
+    def load(self, f, pos, size):
+        version_flags = f.read(4)
+        total = f.read(4)
+        self.total = struct.unpack(">L", total)[0]
+        d_size = self.header_size
+        for i in range(0, self.total):
+            size = struct.unpack(">L", f.read(4))[0]
+            data_format = f.read(4)
+            additional_data = f.read(size-8)
+            if data_format == b'camm' or data_format == b'gpmd':
+                self.entries.append([
+                    size,
+                    str(data_format, 'utf-8'),
+                    str(additional_data, 'utf-8'),
+                ])
+            d_size += 4
+            d_size += 4
+            d_size += size-8
+            if d_size > size:
+                break
+        self.content_size = d_size - self.header_size
+    def create(self):
+        pass
+    @staticmethod
+    def get_data(data):
+        binary = b''
+        return binary
+    def get_values(self):
+        pass
+
+class DinfBox(Box):
+    def __init__(self):
+        Box.__init__(self)
+        self.name = b'dinf'
+        self.total = 0
+        self.entries = []
+    def load(self, f, pos, size):
+        f.seek(pos)
+        d_size = self.header_size
+        dsize = struct.unpack(">I", f.read(4))[0]
+        name = f.read(4)
+        version = struct.unpack(">b", f.read(1))[0]
+        flags = f.read(3)
+        self.total = struct.unpack(">L", f.read(4))[0]
+        data = {
+            'size': dsize,
+            'name': str(name, 'utf-8'),
+            'version': int(version),
+            'flags': str(flags, 'utf-8'),
+            'data': [],
+        }
+        for i in range(0, self.total):
+            _size = struct.unpack(">I", f.read(4))[0]
+            _name = f.read(4)
+            version = struct.unpack(">b", f.read(1))[0]
+            flags = f.read(3)
+            _data = f.read(_size-12)
+            if len(data['data']) < 1:
+                data['data'] = {}
+            data['data'][i] = {
+                'size': _size,
+                'name': str(_name, 'utf-8'),
+                'version': int(version),
+                'flags': str(flags, 'utf-8'),
+            }
+            if _data != b'':
+                data['data'][i]['data'] = str(_data, 'utf-8')
+
+        self.entries = data
+
+        self.content_size = size - self.header_size
+    def create(self):
+        pass
+    @staticmethod
+    def get_data(data):
+        binary = b''
+        return binary
+    def get_values(self):
+        pass
+
+class HdlrBox(Box):
+    def __init__(self):
+        Box.__init__(self)
+        self.name = b'hdlr'
+        self.total = 0
+        self.entries = []
+    def load(self, f, pos, size):
+        f.seek(pos)
+        version_flags = f.read(4)
+        component_type = f.read(4)
+        component_sub_type = f.read(4)
+        component_manufacturer = struct.unpack(">I", f.read(4))[0]
+        component_flags = struct.unpack(">I", f.read(4))[0]
+        component_flags_mask = struct.unpack(">I", f.read(4))[0]
+        component_length = size - self.header_size - (6*4)
+        component_name = f.read(component_length)
+        self.content_size = component_length + 24
+        self.entries = {
+            "component_type": str(component_type, 'utf-8'),
+            "component_sub_type": str(component_sub_type, 'utf-8'),
+            "component_manufacturer": component_manufacturer,
+            "component_flags": component_flags,
+            "component_flags_mask": component_flags_mask,
+            "component_name": str(component_name, 'utf-8'),
+        }
+    def create(self):
+        pass
+    @staticmethod
+    def get_data(data):
+        binary = b''
+        binary += struct.pack(">L", 0)
+        binary += struct.pack(">L", data['total_values'])
+        for i in data['entries']:
+            binary += struct.pack(">L", i[0])
+            binary += struct.pack(">L", i[1])
+        return binary
+    def get_values(self):
+        pass
+
 
 __containers = [
     b'moov',
@@ -240,8 +366,25 @@ def read_childrens(f, pos, fsize, atom):
         stsc.load(f, pos, fsize)
         data = stsc.get_json_values()
     elif atom == b'stsd':
-        print(f.read(fsize-8))
-        print('')
+        stsd = StsdBox()
+        stsd.load(f, pos, fsize)
+        data = stsd.get_json_values()
+    elif atom == b'dinf':
+        dinf = DinfBox()
+        dinf.load(f, pos, fsize)
+        data = dinf.get_json_values()
+    elif atom == b'hdlr':
+        hdlr = HdlrBox()
+        hdlr.load(f, pos, fsize)
+        data = hdlr.get_json_values()
+    else:
+        n = [b'mdat']
+        if atom not in n:
+            try:
+                data = str(f.read(fsize-8), 'utf-16')
+            except:
+                data = None
+
     
     return data
 
@@ -299,12 +442,14 @@ def read_atoms(f, pos, fsize):
 
 def main():
     video = sys.argv[1]
+    vname = Path(video).name.replace(Path(video).suffix, '')
     with open(video, 'rb') as f:
         f.seek(0, 2)
         pos = 0
         fsize = f.tell()
         mp4_st = read_atoms(f, pos, fsize)
-        print(json.dumps(mp4_st, indent=2))
+        with open('./{}.json'.format(vname), 'w') as jf:
+            jf.write(json.dumps(mp4_st, indent=2))
 
 if __name__ == "__main__":
     main()
