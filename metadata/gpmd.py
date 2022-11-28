@@ -152,13 +152,14 @@ def get_gpx_data(gpx_file):
                         'data': 1.0
                     })
                     
+                    device = b'Trek View Telemetry Injector'
                     dvnm = Gpmf()
                     dvnm.key = b'DVNM'
                     dvnm.type = ord('c')
                     dvnm.size = 1
-                    dvnm.repeat = 9
+                    dvnm.repeat = len(device)
                     dvnm.childrens.append({
-                        'data': b'GoPro Max'
+                        'data': device
                     })
                     
                     strm = Gpmf()
