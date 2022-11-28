@@ -33,6 +33,7 @@ class StcoBox(Box):
         self.total = 0
         self.entries = []
     def load(self, f, pos, size):
+        f.seek(pos)
         version_flags = f.read(4)
         total = f.read(4)
         self.total = struct.unpack(">L", total)[0]
@@ -213,8 +214,14 @@ class StsdBox(Box):
             if data_format == b'camm' or data_format == b'gpmd':
                 self.entries.append([
                     size,
-                    str(data_format, 'utf-8'),
-                    str(additional_data, 'utf-8'),
+                    data_format.decode('utf-8', 'backslashreplace'),
+                    additional_data.decode('utf-8', 'backslashreplace'),
+                ])
+            else:
+                self.entries.append([
+                    size,
+                    data_format.decode('utf-8', 'backslashreplace'),
+                    additional_data.decode('utf-8', 'backslashreplace'),
                 ])
             d_size += 4
             d_size += 4
@@ -349,7 +356,7 @@ def read_childrens(f, pos, fsize, atom):
         stco = StcoBox()
         stco.load(f, pos, fsize)
         data = stco.get_json_values()
-    if atom == b'co64':
+    elif atom == b'co64':
         co64 = Co64Box()
         co64.load(f, pos, fsize)
         data = co64.get_json_values()
@@ -381,10 +388,9 @@ def read_childrens(f, pos, fsize, atom):
         n = [b'mdat']
         if atom not in n:
             try:
-                data = str(f.read(fsize-8), 'utf-16')
+                data = f.read(fsize-8).decode('utf-8', 'backslashreplace')
             except:
                 data = None
-
     
     return data
 
