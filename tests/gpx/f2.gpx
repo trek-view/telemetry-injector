@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <trk>
+    <trkseg>
+      <trkpt lat="28.342391666666664" lon="-16.921136111111114">
+        <ele>66.5</ele>
+        <time>2020-02-03T12:32:10Z</time>
+      </trkpt>
+      <trkpt lat="28.34233888888889" lon="-16.92111388888889">
+        <ele>65.8</ele>
+        <time>2020-02-03T12:32:11Z</time>
+      </trkpt>
+      <trkpt lat="28.342274999999997" lon="-16.921097222222222">
+        <ele>65.5</ele>
+        <time>2020-02-03T12:32:12Z</time>
+      </trkpt>
+      <trkpt lat="28.342208333333332" lon="-16.921075000000002">
+        <ele>65.4</ele>
+        <time>2020-02-03T12:32:13Z</time>
+      </trkpt>
+      <trkpt lat="28.342152777777777" lon="-16.921044444444444">
+        <ele>65.2</ele>
+        <time>2020-02-03T12:32:14Z</time>
+      </trkpt>
+      <trkpt lat="28.34209444444444" lon="-16.92101388888889">
+        <ele>65.0</ele>
+        <time>2020-02-03T12:32:15Z</time>
+      </trkpt>
+      <trkpt lat="28.34203611111111" lon="-16.92099166666667">
+        <ele>64.7</ele>
+        <time>2020-02-03T12:32:16Z</time>
+      </trkpt>
+      <trkpt lat="28.341980555555555" lon="-16.920972222222222">
+        <ele>64.4</ele>
+        <time>2020-02-03T12:32:17Z</time>
+      </trkpt>
+      <trkpt lat="28.341925" lon="-16.92095">
+        <ele>64.0</ele>
+        <time>2020-02-03T12:32:18Z</time>
+      </trkpt>
+      <trkpt lat="28.341869444444445" lon="-16.920933333333334">
+        <ele>63.5</ele>
+        <time>2020-02-03T12:32:19Z</time>
+      </trkpt>
+      <trkpt lat="28.341808333333333" lon="-16.920919444444447">
+        <ele>62.8</ele>
+        <time>2020-02-03T12:33:20Z</time>
+      </trkpt>
+      <trkpt lat="28.341755555555554" lon="-16.92090277777778">
+        <ele>62.2</ele>
+        <time>2020-02-03T12:33:21Z</time>
+      </trkpt>
+      <trkpt lat="28.341705555555553" lon="-16.920880555555556">
+        <ele>61.8</ele>
+        <time>2020-02-03T12:33:22Z</time>
+      </trkpt>
+      <trkpt lat="28.341666666666665" lon="-16.920830555555558">
+        <ele>61.4</ele>
+        <time>2020-02-03T12:33:23Z</time>
+      </trkpt>
+      <trkpt lat="28.341649999999998" lon="-16.920761111111112">
+        <ele>61.4</ele>
+        <time>2020-02-03T12:33:24Z</time>
+      </trkpt>
+      <trkpt lat="28.341655555555555" lon="-16.920691666666666">
+        <ele>60.9</ele>
+        <time>2020-02-03T12:33:25Z</time>
+      </trkpt>
+      <trkpt lat="28.34159722222222" lon="-16.920680555555556">
+        <ele>60.5</ele>
+        <time>2020-02-03T12:33:26Z</time>
+      </trkpt>
+      <trkpt lat="28.34153611111111" lon="-16.920708333333334">
+        <ele>59.8</ele>
+        <time>2020-02-03T12:33:27Z</time>
+      </trkpt>
+      <trkpt lat="28.341516666666667" lon="-16.920780555555556">
+        <ele>59.2</ele>
+        <time>2020-02-03T12:33:28Z</time>
+      </trkpt>
+      <trkpt lat="28.34152222222222" lon="-16.92085">
+        <ele>58.4</ele>
+        <time>2020-02-03T12:33:29Z</time>
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

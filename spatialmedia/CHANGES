@@ -1,0 +1,4 @@
+Changes to spatialmedia:
+1. Add some constants (spatialmedia/mpeg/constants.py - #Additions)
+2. Added conditions to box class save method to add additional data to mdat atom if available.(spatialmedia/mpeg/box.py - #mdat additions)
+3. Comment/removed .getchildren() function for it to run for python 3.9+ (spatialmedia/mpeg/metadata_utils.py) #ElementTree fix

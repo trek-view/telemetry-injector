@@ -1,0 +1,11 @@
+node_modules
+node_modules/
+.jekyll-cache
+.jekyll-cache/
+Gemfile.lock
+__pycache__
+__pycache__/
+*.mp4
+demos/*
+telemetry-injector_venv/*
+.DS_Store
